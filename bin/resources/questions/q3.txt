@@ -1,0 +1,6 @@
+QUESTION: Nolan Grayson (Omni-Man) is from which planet?
+OPTION_A: Krypton
+OPTION_B: Viltrum
+OPTION_C: Earth
+OPTION_D: Thraxa
+ANSWER: B

@@ -1,0 +1,6 @@
+QUESTION: What power does Allen the Alien possess?
+OPTION_A: Teleportation
+OPTION_B: Super Strength
+OPTION_C: Energy Projection
+OPTION_D: All of the above
+ANSWER: D

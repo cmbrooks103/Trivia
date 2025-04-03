@@ -1,0 +1,6 @@
+QUESTION: Which hero is NOT part of the original Teen Team?
+OPTION_A: Robot
+OPTION_B: Rex Splode
+OPTION_C: Dupli-Kate
+OPTION_D: Bulletproof
+ANSWER: D

@@ -1,0 +1,6 @@
+QUESTION: Who kills the Guardians of the Globe in Issue #7?
+OPTION_A: Battle Beast
+OPTION_B: Omni-Man
+OPTION_C: Angstrom Levy
+OPTION_D: The Mauler Twins
+ANSWER: B

@@ -1,0 +1,6 @@
+QUESTION: How does the comic series end for Mark Grayson?
+OPTION_A: He becomes Earth's dictator
+OPTION_B: He retires to raise a family
+OPTION_C: He dies saving the universe
+OPTION_D: He leaves Earth forever
+ANSWER: B
