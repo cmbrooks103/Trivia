@@ -1,11 +1,32 @@
 package client;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Properties;
+import java.util.Random;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 public class ClientWindow implements ActionListener {
     // GUI Components
@@ -55,12 +76,15 @@ public class ClientWindow implements ActionListener {
 
         // Options
         for (int i = 0; i < options.length; i++) {
-            options[i] = new JRadioButton();
-            options[i].setBounds(50, 60 + (i * 30), 400, 25);
-            options[i].setEnabled(false);
-            window.add(options[i]);
-            optionGroup.add(options[i]);
-        }
+        options[i] = new JRadioButton("Option " + (i+1)); // Initialize with placeholder text
+        options[i].setBounds(50, 60 + (i * 30), 400, 25);
+        options[i].setFont(new Font("Arial", Font.PLAIN, 14));
+        options[i].setForeground(Color.BLACK); // Explicit text color
+        options[i].setOpaque(true); // Make background visible
+        options[i].setBackground(window.getBackground()); // Match window background
+        window.add(options[i]);
+        optionGroup.add(options[i]);
+    }
 
         // Score
         scoreLabel.setBounds(50, 200, 100, 30);
