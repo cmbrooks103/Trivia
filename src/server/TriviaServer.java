@@ -85,22 +85,17 @@ public class TriviaServer {
 
     private void sendQuestionToAll(int questionNum) {
         String question = questionPool.getQuestion(questionNum);
-        // Only the actual question, no double "QUESTION:" prefix
-        System.out.println("[SERVER] Sending Question #" + questionNum + " to all clients");
-        System.out.println("----------------------------------------");
-        System.out.println(question); // Print the actual question being sent
-        System.out.println("----------------------------------------");
-    
+        System.out.println("[SERVER] Sending question #" + questionNum);
+        System.out.println(question); // Verify complete question is being sent
+        
         questionActive = true;
         buzzQueue.clear();
     
         clients.forEach(client -> {
             try {
-                // Sending question with the correct format
-                client.sendMessage("QUESTION:" + question); // Ensure only one "QUESTION:" prefix
-                System.out.println("[SERVER] Sent to client " + client.getClientId());
+                client.sendMessage("QUESTION:" + question);
             } catch (IOException e) {
-                System.err.println("[SERVER] Error sending to client: " + e.getMessage());
+                System.err.println("Error sending to client: " + e.getMessage());
             }
         });
     }

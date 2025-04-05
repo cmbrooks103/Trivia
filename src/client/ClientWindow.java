@@ -66,46 +66,43 @@ public class ClientWindow implements ActionListener {
     }
 
     private void initializeGUI() {
-        window.setSize(500, 400);
+        window.setSize(600, 500); // Increased size to ensure everything fits
         window.setLayout(null);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Question Label
-        questionLabel.setBounds(50, 20, 400, 30);
+        
+        // Question Label - Make this larger
+        questionLabel.setBounds(50, 30, 500, 50);
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
         window.add(questionLabel);
-
-        // Options
+        
+        // Radio Buttons - Adjust positioning and size
         for (int i = 0; i < options.length; i++) {
-        options[i] = new JRadioButton("Option " + (i+1)); // Initialize with placeholder text
-        options[i].setBounds(50, 60 + (i * 30), 400, 25);
-        options[i].setFont(new Font("Arial", Font.PLAIN, 14));
-        options[i].setForeground(Color.BLACK); // Explicit text color
-        options[i].setOpaque(true); // Make background visible
-        options[i].setBackground(window.getBackground()); // Match window background
-        window.add(options[i]);
-        optionGroup.add(options[i]);
-    }
-
-        // Score
-        scoreLabel.setBounds(50, 200, 100, 30);
+            options[i] = new JRadioButton();
+            options[i].setBounds(70, 100 + (i * 40), 450, 30); // More vertical space
+            options[i].setFont(new Font("Arial", Font.PLAIN, 14));
+            options[i].setOpaque(true); // Make background visible
+            options[i].setBackground(new Color(240, 240, 240)); // Light gray background
+            window.add(options[i]);
+            optionGroup.add(options[i]);
+        }
+        
+        // Score Label
+        scoreLabel.setBounds(70, 280, 200, 30);
         window.add(scoreLabel);
-
-        // Timer
-        timerLabel.setBounds(400, 200, 50, 30);
-        timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        // Timer Label
+        timerLabel.setBounds(400, 280, 100, 30);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 18));
         window.add(timerLabel);
-
-        // Buttons
-        pollButton.setBounds(50, 250, 150, 40);
-        pollButton.addActionListener(this);
-        pollButton.setEnabled(false);
+        
+        // Buttons - Make them larger
+        pollButton.setBounds(70, 330, 150, 40);
+        pollButton.setFont(new Font("Arial", Font.BOLD, 14));
         window.add(pollButton);
-
-        submitButton.setBounds(250, 250, 150, 40);
-        submitButton.addActionListener(this);
-        submitButton.setEnabled(false);
+        
+        submitButton.setBounds(250, 330, 150, 40);
+        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         window.add(submitButton);
-
+        
         window.setVisible(true);
     }
 
@@ -224,36 +221,47 @@ public class ClientWindow implements ActionListener {
     private void handleQuestion(String questionData) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Reset UI state
-                questionLabel.setText("Loading question...");
-                for (JRadioButton option : options) {
-                    option.setText("");
-                    option.setSelected(false);
-                    option.setEnabled(false);
+                // Clear previous state
+                questionLabel.setText("Loading...");
+                optionGroup.clearSelection();
+                
+                // Debug output
+                System.out.println("Received question data:\n" + questionData);
+                
+                // Split and process lines
+                String[] lines = questionData.split("\n");
+                
+                for (String line : lines) {
+                    line = line.trim();
+                    if (line.startsWith("QUESTION:")) {
+                        questionLabel.setText("<html>Q" + currentQuestion + ": " + 
+                                           line.substring(9).trim() + "</html>");
+                    }
+                    else if (line.startsWith("OPTION_A:")) {
+                        options[0].setText(line.substring(9).trim());
+                        options[0].setVisible(true);
+                    }
+                    else if (line.startsWith("OPTION_B:")) {
+                        options[1].setText(line.substring(9).trim());
+                        options[1].setVisible(true);
+                    }
+                    else if (line.startsWith("OPTION_C:")) {
+                        options[2].setText(line.substring(9).trim());
+                        options[2].setVisible(true);
+                    }
+                    else if (line.startsWith("OPTION_D:")) {
+                        options[3].setText(line.substring(9).trim());
+                        options[3].setVisible(true);
+                    }
                 }
-    
-                // Parse and display question
-                String[] parts = questionData.split("\n");
-                String qText = parts[0].replace("QUESTION:", "").trim();
-                System.out.println("DEBUG: Parsed Question Text: " + qText);
-                questionLabel.setText("Q" + currentQuestion + ": " + qText);
-    
-                // Display options
-                for (int i = 0; i < 4 && (i + 1) < parts.length; i++) {
-                    String optionText = parts[i + 1].substring(parts[i + 1].indexOf(":") + 1).trim();
-                    System.out.println("DEBUG: Option " + (i + 1) + ": " + optionText);
-                    options[i].setText(optionText);
-                    options[i].setEnabled(true);
-                }
-    
-                // Start the timer and enable the buttons for answering
-                startTimer(30);
-                pollButton.setEnabled(true);
-                submitButton.setEnabled(true);
-                currentQuestion++;
+                
+                // Force UI update
+                window.revalidate();
+                window.repaint();
+                
             } catch (Exception e) {
-                updateStatus("Error loading question");
-                System.err.println("Question display error: " + e.getMessage());
+                questionLabel.setText("Error loading question");
+                e.printStackTrace();
             }
         });
     }
