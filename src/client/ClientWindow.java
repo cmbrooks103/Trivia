@@ -77,14 +77,18 @@ private void initializeGUI() {
     window.add(questionLabel);
 
     // Options
-    for (int i = 0; i < options.length; i++) {
-        options[i] = new JRadioButton();
-        options[i].setBounds(50, 60 + (i * 30), 400, 25);
-        options[i].setFont(new Font("Arial", Font.PLAIN, 14));
-        options[i].setBorder(BorderFactory.createLineBorder(Color.BLUE));  // Debug border
-        window.add(options[i]);
-        optionGroup.add(options[i]);
-    }
+// In initializeGUI():
+for (int i = 0; i < options.length; i++) {
+    options[i] = new JRadioButton();
+    options[i].setBounds(50, 60 + (i * 40), 400, 30); // Increased height and spacing
+    options[i].setFont(new Font("Arial", Font.PLAIN, 14));
+    options[i].setForeground(Color.BLACK); // <-- THIS IS THE NEW LINE FOR FONT COLOR
+    options[i].setBackground(Color.WHITE); // Make sure background is visible
+    options[i].setOpaque(true); // Required for background color
+    options[i].setBorder(BorderFactory.createLineBorder(Color.BLUE));  // Debug border
+    window.add(options[i]);
+    optionGroup.add(options[i]);
+}
 
     // Other components...
     scoreLabel.setBounds(50, 200, 100, 30);
@@ -185,66 +189,75 @@ private void initializeGUI() {
                 System.out.println("Received: " + message);
                 
                 if (message.startsWith("QUESTION:")) {
-                    handleQuestion(message.substring(9));
+                    // Handle multi-line question
+                    StringBuilder fullQuestion = new StringBuilder(message);
+                    // Read additional lines until empty line
+                    while (!(message = in.readLine()).isEmpty()) {
+                        fullQuestion.append("\n").append(message);
+                    }
+                    handleQuestion(fullQuestion.toString().substring(9)); // Remove "QUESTION:"
                 }
-                else if (message.equals("ACK")) {
-                    enableAnswering();
-                }
-                else if (message.startsWith("SCORE:")) {
-                    updateScore(Integer.parseInt(message.substring(6)));
-                }
-                else if (message.equals("CORRECT")) {
-                    updateStatus("Correct! +10 points");
-                }
-                else if (message.equals("WRONG")) {
-                    updateStatus("Wrong answer! -10 points");
-                }
-                else if (message.equals("GAME_OVER")) {
-                    showFinalResults();
-                }
+                // ... rest of your existing message handling ...
             }
         } catch (IOException e) {
-            SwingUtilities.invokeLater(() -> {
-                updateStatus("Disconnected from server");
-                pollButton.setEnabled(false);
-                submitButton.setEnabled(false);
-            });
+            // ... error handling ...
         }
     }
 
     private void handleQuestion(String questionData) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Reset UI state
-                questionLabel.setText("Loading question...");
-                for (JRadioButton option : options) {
-                    option.setText("");
-                    option.setSelected(false);
-                    option.setEnabled(false);
+                // 1. Debug raw input
+                System.out.println("=== RAW QUESTION ===");
+                System.out.println(questionData);
+    
+                // 2. Normalize line endings and split
+                String normalized = questionData.replace("\r", "");
+                String[] lines = normalized.split("\n");
+                
+                // 3. Process each line
+                for (String line : lines) {
+                    line = line.trim();
+                    if (line.isEmpty()) continue;
+    
+                    if (line.startsWith("QUESTION:")) {
+                        String qText = line.substring("QUESTION:".length()).trim();
+                        questionLabel.setText("Q" + currentQuestion + ": " + qText);
+                    } 
+                    // Handle options explicitly
+                    else if (line.startsWith("OPTION_A:")) {
+                        options[0].setText(line.substring("OPTION_A:".length()).trim());
+                        options[0].setEnabled(true);
+                    } 
+                    else if (line.startsWith("OPTION_B:")) {
+                        options[1].setText(line.substring("OPTION_B:".length()).trim());
+                        options[1].setEnabled(true);
+                    }
+                    else if (line.startsWith("OPTION_C:")) {
+                        options[2].setText(line.substring("OPTION_C:".length()).trim());
+                        options[2].setEnabled(true);
+                    }
+                    else if (line.startsWith("OPTION_D:")) {
+                        options[3].setText(line.substring("OPTION_D:".length()).trim());
+                        options[3].setEnabled(true);
+                    }
                 }
     
-                // Parse and display question
-                String[] parts = questionData.split("\n");
-                String qText = parts[0].replace("QUESTION:", "").trim();
-                System.out.println("DEBUG: Parsed Question Text: " + qText);
-                questionLabel.setText("Q" + currentQuestion + ": " + qText);
-    
-                // Display options
-                for (int i = 0; i < 4 && (i + 1) < parts.length; i++) {
-                    String optionText = parts[i + 1].substring(parts[i + 1].indexOf(":") + 1).trim();
-                    System.out.println("DEBUG: Option " + (i + 1) + ": " + optionText);
-                    options[i].setText(optionText);
-                    options[i].setEnabled(true);
+                // Debug final option states
+                System.out.println("=== FINAL OPTIONS ===");
+                for (int i = 0; i < options.length; i++) {
+                    System.out.printf("Option %d: '%s' (enabled: %b)\n", 
+                        i, options[i].getText(), options[i].isEnabled());
                 }
     
-                // Start the timer and enable the buttons for answering
                 startTimer(30);
                 pollButton.setEnabled(true);
                 submitButton.setEnabled(true);
                 currentQuestion++;
+    
             } catch (Exception e) {
                 updateStatus("Error loading question");
-                System.err.println("Question display error: " + e.getMessage());
+                e.printStackTrace();
             }
         });
     }

@@ -86,14 +86,22 @@ public class TriviaServer {
     private void sendQuestionToAll(int questionNum) {
         String question = questionPool.getQuestion(questionNum);
         System.out.println("[SERVER] Sending question #" + questionNum);
-        System.out.println(question); // Verify complete question is being sent
+        
+        // Split into lines and send with a delimiter
+        String[] lines = question.split("\n");
+        StringBuilder completeQuestion = new StringBuilder();
+        
+        for (String line : lines) {
+            completeQuestion.append(line).append("\n"); // Rebuild with newlines
+        }
         
         questionActive = true;
         buzzQueue.clear();
     
         clients.forEach(client -> {
             try {
-                client.sendMessage("QUESTION:" + question);
+                // Send as one complete message with newlines
+                client.sendMessage("QUESTION:" + completeQuestion.toString());
             } catch (IOException e) {
                 System.err.println("Error sending to client: " + e.getMessage());
             }
