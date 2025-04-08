@@ -1,6 +1,6 @@
-QUESTION: What is the capital of France?
-OPTION_A: London
-OPTION_B: Paris
-OPTION_C: Berlin
-OPTION_D: Madrid
+QUESTION: What is the capital of New York?
+OPTION_A: New York City
+OPTION_B: Albany
+OPTION_C: Buffalo
+OPTION_D: Rochester
 ANSWER: B

@@ -1,0 +1,6 @@
+QUESTION: Which team was formed by Professor X?
+OPTION_A: The X-Men
+OPTION_B: The Brotherhood
+OPTION_C: The Avengers
+OPTION_D: The Fantastic Four
+ANSWER: A

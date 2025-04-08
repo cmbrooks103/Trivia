@@ -1,0 +1,6 @@
+QUESTION: Who is known as the Man of Steel?
+OPTION_A: Batman
+OPTION_B: Superman
+OPTION_C: Wonder Woman
+OPTION_D: The Flash
+ANSWER: B

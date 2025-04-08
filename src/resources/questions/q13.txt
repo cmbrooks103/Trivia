@@ -1,0 +1,6 @@
+QUESTION: Who wields the enchanted hammer Mjolnir?
+OPTION_A: Loki
+OPTION_B: Odin
+OPTION_C: Thor
+OPTION_D: Hulk
+ANSWER: C

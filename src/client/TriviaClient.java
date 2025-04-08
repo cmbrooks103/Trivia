@@ -13,6 +13,7 @@ public class TriviaClient {
                     "Error", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }
+            
         });
     }
 }

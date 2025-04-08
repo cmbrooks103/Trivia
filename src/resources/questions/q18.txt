@@ -1,0 +1,6 @@
+QUESTION: Which superhero's secret identity is Bruce Wayne?
+OPTION_A: Superman
+OPTION_B: Batman
+OPTION_C: Green Lantern
+OPTION_D: Aquaman
+ANSWER: B

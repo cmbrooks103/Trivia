@@ -1,0 +1,6 @@
+QUESTION: Who is the "Merc with a Mouth"?
+OPTION_A: Deadpool
+OPTION_B: Wolverine
+OPTION_C: Spider-Man
+OPTION_D: Iron Man
+ANSWER: A

@@ -1,0 +1,6 @@
+QUESTION: Who is the archenemy of the Fantastic Four?
+OPTION_A: Doctor Doom
+OPTION_B: Galactus
+OPTION_C: Loki
+OPTION_D: Thanos
+ANSWER: A

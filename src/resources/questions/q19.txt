@@ -1,0 +1,6 @@
+QUESTION: Who is considered the leader of the Avengers?
+OPTION_A: Captain America
+OPTION_B: Iron Man
+OPTION_C: Thor
+OPTION_D: Hawkeye
+ANSWER: A

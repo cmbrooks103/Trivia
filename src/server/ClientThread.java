@@ -24,15 +24,12 @@ public class ClientThread implements Runnable {
     @Override
     public void run() {
         try {
-            // Get client ID
             String message = in.readLine();
             if (message != null && message.startsWith("CLIENT_ID:")) {
                 clientId = message.substring(10);
                 server.addClient(this);
                 System.out.println("Client " + clientId + " connected");
             }
-
-            // Process messages
             while ((message = in.readLine()) != null) {
                 if (message.startsWith("ANSWER:")) {
                     int answer = Integer.parseInt(message.substring(7));
@@ -53,5 +50,14 @@ public class ClientThread implements Runnable {
 
     public String getClientId() {
         return clientId;
+    }
+
+    // Forcefully close the client's connection.
+    public void kill() {
+        try {
+            socket.close();
+        } catch(IOException e) {
+            // Silent catch.
+        }
     }
 }

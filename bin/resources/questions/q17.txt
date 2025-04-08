@@ -1,0 +1,6 @@
+QUESTION: Which villain is the Clown Prince of Crime?
+OPTION_A: Joker
+OPTION_B: Bane
+OPTION_C: Lex Luthor
+OPTION_D: Riddler
+ANSWER: A

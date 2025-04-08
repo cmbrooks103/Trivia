@@ -1,0 +1,6 @@
+QUESTION: Who is the Black Panther?
+OPTION_A: T'Challa
+OPTION_B: Killmonger
+OPTION_C: M'Baku
+OPTION_D: Shuri
+ANSWER: A
