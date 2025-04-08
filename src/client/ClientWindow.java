@@ -66,43 +66,57 @@ public class ClientWindow implements ActionListener {
         loadConfiguration();
     }
 
-private void initializeGUI() {
-    window.setSize(500, 400);
-    window.setLayout(null);  // Using null layout for absolute positioning
-    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    // Question Label
-    questionLabel.setBounds(50, 20, 400, 30);
-    questionLabel.setBorder(BorderFactory.createLineBorder(Color.RED));  // Debug border
-    window.add(questionLabel);
-
-    // Options
-// In initializeGUI():
-for (int i = 0; i < options.length; i++) {
-    options[i] = new JRadioButton();
-    options[i].setBounds(50, 60 + (i * 40), 400, 30); // Increased height and spacing
-    options[i].setFont(new Font("Arial", Font.PLAIN, 14));
-    options[i].setForeground(Color.BLACK); // <-- THIS IS THE NEW LINE FOR FONT COLOR
-    options[i].setBackground(Color.WHITE); // Make sure background is visible
-    options[i].setOpaque(true); // Required for background color
-    options[i].setBorder(BorderFactory.createLineBorder(Color.BLUE));  // Debug border
-    window.add(options[i]);
-    optionGroup.add(options[i]);
-}
-
-    // Other components...
-    scoreLabel.setBounds(50, 200, 100, 30);
-    scoreLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN));  // Debug border
-    window.add(scoreLabel);
-
-    // Timer and buttons...
-    timerLabel.setBounds(400, 200, 50, 30);
-    timerLabel.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));  // Debug border
-    window.add(timerLabel);
-
-    // Make window visible last
-    window.setVisible(true);
-}
+    private void initializeGUI() {
+        window.setSize(500, 500); // Increased height to accommodate all components
+        window.setLayout(null);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+        // Question Label
+        questionLabel.setBounds(50, 20, 400, 30);
+        questionLabel.setBorder(BorderFactory.createLineBorder(Color.RED));
+        window.add(questionLabel);
+    
+        // Options
+        for (int i = 0; i < options.length; i++) {
+            options[i] = new JRadioButton();
+            options[i].setBounds(50, 60 + (i * 40), 400, 30);
+            options[i].setFont(new Font("Arial", Font.PLAIN, 14));
+            options[i].setForeground(Color.BLACK);
+            options[i].setBackground(Color.WHITE);
+            options[i].setOpaque(true);
+            options[i].setBorder(BorderFactory.createLineBorder(Color.BLUE));
+            window.add(options[i]);
+            optionGroup.add(options[i]);
+        }
+    
+        // Buzz In Button
+        pollButton.setBounds(50, 220, 150, 40);
+        pollButton.setFont(new Font("Arial", Font.BOLD, 14));
+        pollButton.addActionListener(this);
+        pollButton.setEnabled(false); // Initially disabled until connection
+        window.add(pollButton);
+    
+        // Submit Button
+        submitButton.setBounds(220, 220, 150, 40);
+        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
+        submitButton.addActionListener(this);
+        submitButton.setEnabled(false); // Initially disabled
+        window.add(submitButton);
+    
+        // Score Label
+        scoreLabel.setBounds(50, 280, 150, 30);
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        scoreLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+        window.add(scoreLabel);
+    
+        // Timer Label
+        timerLabel.setBounds(350, 280, 100, 30);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timerLabel.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
+        window.add(timerLabel);
+    
+        window.setVisible(true);
+    }
 
     private void loadConfiguration() {
         Properties config = new Properties();
