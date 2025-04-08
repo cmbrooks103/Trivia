@@ -15,10 +15,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -51,6 +55,9 @@ public class ClientWindow implements ActionListener {
     private boolean canAnswer = false;
     private int currentQuestion = 1;
 
+    // Audio
+    private Clip backgroundMusic;
+
     // Colors
     private final Color YELLOW_COLOR = new Color(255, 255, 128); // Light yellow
     private final Color BLUE_COLOR = new Color(0, 149, 237);  // Light blue
@@ -74,7 +81,24 @@ public class ClientWindow implements ActionListener {
         window.setSize(500, 400);
         window.setLayout(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.getContentPane().setBackground(YELLOW_COLOR); // Main window background
+        window.getContentPane().setBackground(YELLOW_COLOR);
+
+        // Add window listeners for music control
+        window.addWindowFocusListener(new java.awt.event.WindowAdapter() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                playBackgroundMusic();
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+                pauseBackgroundMusic();
+            }
+        });
+
+        window.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                stopBackgroundMusic();
+            }
+        });
 
         // Question label
         questionLabel.setBounds(50, 20, 400, 30);
@@ -129,6 +153,44 @@ public class ClientWindow implements ActionListener {
         window.add(submitButton);
 
         window.setVisible(true);
+        playBackgroundMusic(); // Start music when window opens
+    }
+
+    private void playBackgroundMusic() {
+        try {
+            // Stop any currently playing music
+            if (backgroundMusic != null && backgroundMusic.isRunning()) {
+                backgroundMusic.stop();
+            }
+            
+            // Load the audio file from the client package
+            URL url = getClass().getResource("song.wav");
+            if (url == null) {
+                System.err.println("Could not find song.wav in client package");
+                return;
+            }
+            
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioIn);
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundMusic.start();
+        } catch (Exception e) {
+            System.err.println("Error playing background music: " + e.getMessage());
+        }
+    }
+
+    private void pauseBackgroundMusic() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.close();
+        }
     }
 
     private void loadConfiguration() {
@@ -201,7 +263,6 @@ public class ClientWindow implements ActionListener {
                     updateStatus("Disconnected");
                     pollButton.setEnabled(false);
                     submitButton.setEnabled(false);
-                    // Optionally, break out of the loop.
                     break;
                 } else if (message.startsWith("SCORE:")) {
                     updateScore(Integer.parseInt(message.substring(6)));
@@ -224,13 +285,9 @@ public class ClientWindow implements ActionListener {
         }
     }
 
-    // Updated handleQuestion:
-    // The protocol remains that the server sends a single line encoded with "|||":
-    // Format: "QUESTION:<questionNumber>|||<Question Text>|||<Option A>|||<Option B>|||<Option C>|||<Option D>"
     private void handleQuestion(String questionData) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Copy the parameter into a final variable for debugging (do not modify that)
                 final String originalData = questionData;
                 System.out.println("DEBUG: Raw questionData: \"" + originalData + "\"");
                 
@@ -239,13 +296,10 @@ public class ClientWindow implements ActionListener {
                     return;
                 }
                 
-                // Create a mutable copy of the parameter so we can modify it.
                 String data = originalData;
-                // Remove the prefix "QUESTION:" if present.
                 if (data.startsWith("QUESTION:")) {
                     data = data.substring("QUESTION:".length());
                 }
-                // Split using the delimiter "|||"
                 String[] parts = data.split("\\|\\|\\|");
                 if (parts.length < 6) {
                     updateStatus("Error: Incomplete question data received");
@@ -256,7 +310,6 @@ public class ClientWindow implements ActionListener {
                 String qText = parts[1].trim();
                 questionLabel.setText("Q" + qNum + ": " + qText);
                 
-                // Display the four options but keep them disabled until you buzz in.
                 for (int i = 0; i < 4; i++) {
                     String option = parts[i + 2].trim();
                     options[i].setText(option);
@@ -264,10 +317,6 @@ public class ClientWindow implements ActionListener {
                     options[i].setSelected(false);
                 }
                 
-                // When a new question is sent:
-                // - Enable the poll (buzz in) button.
-                // - Disable the submit button until buzzing in.
-                // - Disable the answer options until buzzing in.
                 startTimer(30);
                 pollButton.setEnabled(true);
                 submitButton.setEnabled(false);
@@ -279,8 +328,6 @@ public class ClientWindow implements ActionListener {
         });
     }
 
-    // enableAnswering is only called after the server sends an "ACK" message in response to your buzz.
-    // This method enables the answer options and submit button.
     private void enableAnswering() {
         SwingUtilities.invokeLater(() -> {
             canAnswer = true;
@@ -288,12 +335,10 @@ public class ClientWindow implements ActionListener {
                 option.setEnabled(true);
             }
             submitButton.setEnabled(true);
-            // You might also want to adjust the timer for answering (e.g., shorten it to 10 seconds)
             startTimer(10);
         });
     }
 
-    // submitAnswer sends the answer to the server and then disables interaction until next question.
     private void submitAnswer(int answer) {
         if (answer == -1) {
             System.out.println("DEBUG: No answer selected, skipping answer submission.");
@@ -303,12 +348,10 @@ public class ClientWindow implements ActionListener {
         System.out.println("DEBUG: Answer submitted: " + answer);
         canAnswer = false;
         SwingUtilities.invokeLater(() -> {
-            // Disable the submit button and answer options until the next question
             submitButton.setEnabled(false);
             for (JRadioButton option : options) {
                 option.setEnabled(false);
             }
-            // Also disable the poll button in case it hasn't been re-enabled.
             pollButton.setEnabled(false);
         });
     }
@@ -341,7 +384,6 @@ public class ClientWindow implements ActionListener {
                 byte[] data = ("BUZZ:" + clientId).getBytes();
                 DatagramPacket packet = new DatagramPacket(data, data.length, serverAddress, 5000);
                 udpSocket.send(packet);
-                // Disable the poll button immediately after buzzing in.
                 SwingUtilities.invokeLater(() -> pollButton.setEnabled(false));
             } catch (IOException ex) {
                 updateStatus("Error sending buzz");
@@ -353,7 +395,6 @@ public class ClientWindow implements ActionListener {
                     return;
                 }
             }
-            // If no option is selected, treat it as a missed answer.
             submitAnswer(-1);
         }
     }
@@ -376,6 +417,7 @@ public class ClientWindow implements ActionListener {
             questionLabel.setText("Game Over! Final Score: " + score);
             pollButton.setEnabled(false);
             submitButton.setEnabled(false);
+            stopBackgroundMusic();
         });
     }
 
