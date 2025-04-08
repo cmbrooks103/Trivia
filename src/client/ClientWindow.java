@@ -1,11 +1,33 @@
 package client;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Properties;
+import java.util.Random;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 
 public class ClientWindow implements ActionListener {
     // GUI Components
@@ -29,6 +51,11 @@ public class ClientWindow implements ActionListener {
     private boolean canAnswer = false;
     private int currentQuestion = 1;
 
+    // Colors
+    private final Color YELLOW_COLOR = new Color(255, 255, 128); // Light yellow
+    private final Color BLUE_COLOR = new Color(0, 149, 237);  // Light blue
+    private final Color BLUE_BORDER = new Color(0, 0, 139);     // Dark blue for borders
+
     public ClientWindow() {
         window = new JFrame();
         questionLabel = new JLabel("Loading configuration...", SwingConstants.CENTER);
@@ -47,42 +74,58 @@ public class ClientWindow implements ActionListener {
         window.setSize(500, 400);
         window.setLayout(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.getContentPane().setBackground(YELLOW_COLOR); // Main window background
 
         // Question label
         questionLabel.setBounds(50, 20, 400, 30);
+        questionLabel.setOpaque(true);
+        questionLabel.setBackground(BLUE_COLOR);
+        questionLabel.setBorder(new LineBorder(BLUE_BORDER, 2));
         window.add(questionLabel);
 
         // Answer options
         for (int i = 0; i < options.length; i++) {
             options[i] = new JRadioButton();
             options[i].setBounds(50, 60 + (i * 30), 400, 25);
-            // Initially, disable options until buzz in
             options[i].setEnabled(false);
+            options[i].setOpaque(true);
+            options[i].setBackground(BLUE_COLOR);
+            options[i].setBorder(new LineBorder(BLUE_BORDER, 1));
             window.add(options[i]);
             optionGroup.add(options[i]);
         }
 
         // Score label
         scoreLabel.setBounds(50, 200, 100, 30);
+        scoreLabel.setOpaque(true);
+        scoreLabel.setBackground(BLUE_COLOR);
+        scoreLabel.setBorder(new LineBorder(BLUE_BORDER, 1));
         window.add(scoreLabel);
 
         // Timer label
         timerLabel.setBounds(400, 200, 50, 30);
         timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timerLabel.setOpaque(true);
+        timerLabel.setBackground(BLUE_COLOR);
+        timerLabel.setBorder(new LineBorder(BLUE_BORDER, 1));
         window.add(timerLabel);
 
         // Buzz button (poll)
         pollButton.setBounds(50, 250, 150, 40);
         pollButton.addActionListener(this);
-        // Enable poll button on a new question
         pollButton.setEnabled(true);
+        pollButton.setBackground(BLUE_COLOR);
+        pollButton.setBorder(new LineBorder(BLUE_BORDER, 2));
+        pollButton.setForeground(Color.BLACK);
         window.add(pollButton);
 
         // Submit button
         submitButton.setBounds(250, 250, 150, 40);
         submitButton.addActionListener(this);
-        // Initially disabled until buzz in ACK is received.
         submitButton.setEnabled(false);
+        submitButton.setBackground(BLUE_COLOR);
+        submitButton.setBorder(new LineBorder(BLUE_BORDER, 2));
+        submitButton.setForeground(Color.BLACK);
         window.add(submitButton);
 
         window.setVisible(true);
